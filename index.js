@@ -87,6 +87,62 @@ class HttpdFacility extends Base {
 
     this.server = fastify
 
+    if (this.opts.onBadMethod) {
+      const methodsByPath = new Map()
+      const patternsByHead = new Map()
+
+      function sendByStatusCode (statusCode, method, route) {
+        if (statusCode === 404) {
+          return {
+            message: `Route ${method}:${route} not found`,
+            error: 'Not Found',
+            statusCode: 404
+          }
+        }
+        if (statusCode === 405) {
+          return {
+            message: `Route ${method}:${route} method not allowed`,
+            error: 'Method Not Allowed',
+            statusCode: 405
+          }
+        }
+      }
+
+      function normalize (p) { return (p.split('?')[0] || '/').replace(/\/+$/, '') || '/' }
+      function head (p) { const s = normalize(p).split('/').filter(Boolean); return s[0] || '' }
+      function toRegex (routePath) {
+        const norm = normalize(routePath)
+        const esc = norm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        return new RegExp('^' + esc.replace(/:(\w+)/g, '[^/]+') + '$')
+      }
+
+      this.server.addHook('onRoute', (route) => {
+        const methods = new Set([].concat(route.method).map(m => String(m).toUpperCase()))
+        const p = normalize(route.path)
+        if (!p.includes(':') && !p.includes('*')) {
+          const set = methodsByPath.get(p) || new Set()
+          methods.forEach(m => set.add(m))
+          if (!methodsByPath.has(p)) methodsByPath.set(p, set)
+        } else {
+          const bucket = patternsByHead.get(head(p)) || []
+          bucket.push({ regex: toRegex(p), methods })
+          patternsByHead.set(head(p), bucket)
+        }
+      })
+
+      this.server.setNotFoundHandler((req, reply) => {
+        const p = normalize(req.url)
+        const exact = methodsByPath.get(p)
+        if (exact && exact.size) return reply.code(405).header('Allow', [...exact].join(', ')).send(sendByStatusCode(405, req.method, req.url))
+
+        const bucket = patternsByHead.get(head(p)) || []
+        const hit = bucket.find(r => r.regex.test(p))
+        if (hit) return reply.code(405).header('Allow', [...hit.methods].join(', ')).send(sendByStatusCode(405, req.method, req.url))
+
+        reply.code(404).send(sendByStatusCode(404, req.method, req.url))
+      })
+    }
+
     if (this.opts.staticRootPath) {
       this.server.register(require('@fastify/static'), {
         root: this.opts.staticRootPath,
