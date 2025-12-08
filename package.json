@@ -17,10 +17,9 @@
     "test": "npm run lint"
   },
   "dependencies": {
+    "@bitfinex/bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "@fastify/static": "^6.10.2",
     "async": "^3.2.1",
-    "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
-    "debug": "^4.3.4",
     "fastify": "^4.21.0"
   },
   "devDependencies": {
