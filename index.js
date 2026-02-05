@@ -40,7 +40,7 @@ class HttpdFacility extends Base {
 
     this.init()
 
-    this.mem = { plugins: [], routes: [], decorators: [], hooks: [] }
+    this.mem = { plugins: [], routes: [], decorators: [], hooks: [], errorHandler: null }
   }
 
   addRoute (r) {
@@ -73,6 +73,14 @@ class HttpdFacility extends Base {
     }
 
     this.mem.hooks.push({ name: hookName, handler })
+  }
+
+  addErrorHandler (handler) {
+    if (this.server) {
+      throw new Error('ERR_FACS_SERVER_HTTP_ALREADY_INITED')
+    }
+
+    this.mem.errorHandler = handler
   }
 
   async startServer () {
@@ -125,6 +133,10 @@ class HttpdFacility extends Base {
         this.server.route(r)
       })
     })
+
+    if (this.mem.errorHandler) {
+      this.server.setErrorHandler(this.mem.errorHandler)
+    }
 
     return await this.server.listen({
       port: this.opts.port || this.conf.port
