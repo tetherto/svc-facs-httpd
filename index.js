@@ -88,7 +88,6 @@ class HttpdFacility extends Base {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_CREATE_DUP')
     }
-    console.log('Starting HTTP server...', this.opts)
     const fastify = Fastify({
       logger: this.opts.logger,
       trustProxy: this.opts.trustProxy,
