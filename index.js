@@ -32,7 +32,7 @@ const DEFAULT_ROUTES = [
 ]
 
 class HttpdFacility extends Base {
-  constructor(caller, opts, ctx) {
+  constructor (caller, opts, ctx) {
     super(caller, opts, ctx)
 
     this.name = 'httpd'
@@ -44,7 +44,7 @@ class HttpdFacility extends Base {
     this.errorHandler = opts.errorHandler ?? null
   }
 
-  addRoute(r) {
+  addRoute (r) {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_ALREADY_INITED')
     }
@@ -52,7 +52,7 @@ class HttpdFacility extends Base {
     this.mem.routes.push(r)
   }
 
-  addDecorator(d) {
+  addDecorator (d) {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_ALREADY_INITED')
     }
@@ -60,7 +60,7 @@ class HttpdFacility extends Base {
     this.mem.decorators.push(d)
   }
 
-  addPlugin(p) {
+  addPlugin (p) {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_ALREADY_INITED')
     }
@@ -68,7 +68,7 @@ class HttpdFacility extends Base {
     this.mem.plugins.push(p)
   }
 
-  addHook(hookName, handler) {
+  addHook (hookName, handler) {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_ALREADY_INITED')
     }
@@ -76,7 +76,7 @@ class HttpdFacility extends Base {
     this.mem.hooks.push({ name: hookName, handler })
   }
 
-  addErrorHandler(handler) {
+  addErrorHandler (handler) {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_ALREADY_INITED')
     }
@@ -84,11 +84,11 @@ class HttpdFacility extends Base {
     this.errorHandler = handler
   }
 
-  async startServer() {
+  async startServer () {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_CREATE_DUP')
     }
-
+    console.log('Starting HTTP server...', this.opts)
     const fastify = Fastify({
       logger: this.opts.logger,
       trustProxy: this.opts.trustProxy,
@@ -145,7 +145,7 @@ class HttpdFacility extends Base {
     })
   }
 
-  _stop(cb) {
+  _stop (cb) {
     async.series([
       next => { super._stop(next) },
       async () => {
