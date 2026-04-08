@@ -91,7 +91,8 @@ class HttpdFacility extends Base {
 
     const fastify = Fastify({
       logger: this.opts.logger,
-      trustProxy: this.opts.trustProxy
+      trustProxy: this.opts.trustProxy,
+      bodyLimit: this.opts.bodyLimit
     })
 
     this.server = fastify
