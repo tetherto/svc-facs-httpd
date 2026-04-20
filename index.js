@@ -140,7 +140,8 @@ class HttpdFacility extends Base {
     }
 
     return await this.server.listen({
-      port: this.opts.port || this.conf.port
+      port: this.opts.port || this.conf.port,
+      host: this.opts.host || this.conf.host
     })
   }
 
