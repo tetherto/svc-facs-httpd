@@ -1,5 +1,5 @@
 {
-  "name": "svc-facs-httpd",
+  "name": "@tetherto/svc-facs-httpd",
   "version": "1.0.0",
   "private": false,
   "description": "SVC Facility Fastify",
