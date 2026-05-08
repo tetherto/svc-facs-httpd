@@ -88,10 +88,10 @@ class HttpdFacility extends Base {
     if (this.server) {
       throw new Error('ERR_FACS_SERVER_HTTP_CREATE_DUP')
     }
-
     const fastify = Fastify({
       logger: this.opts.logger,
-      trustProxy: this.opts.trustProxy
+      trustProxy: this.opts.trustProxy,
+      bodyLimit: this.opts.bodyLimit
     })
 
     this.server = fastify
@@ -140,7 +140,8 @@ class HttpdFacility extends Base {
     }
 
     return await this.server.listen({
-      port: this.opts.port || this.conf.port
+      port: this.opts.port || this.conf.port,
+      host: this.opts.host || this.conf.host
     })
   }
 
